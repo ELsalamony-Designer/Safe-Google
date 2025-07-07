@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AppTime Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #0f0f1a;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    input {
+      width: 150px;
+    }
+    button {
+      background-color: #00ffff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffff;
+    }
+    button:hover {
+      background-color: #00cccc;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+    #entries {
+      margin-top: 20px;
+    }
+    .entry {
+      margin: 10px 0;
+    }
+    .reset-btn {
+      margin-top: 30px;
+      background-color: #ff0044;
+      box-shadow: 0 0 10px #ff0044;
+      color: white;
+    }
+    .reset-btn:hover {
+      background-color: #cc0033;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>AppTime Tracker</h1>
+
+  <input type="text" id="appName" placeholder="App Name">
+  <input type="number" id="appTime" placeholder="Time (mins)">
+  <button onclick="addEntry()">Add</button>
+
+  <div id="entries"></div>
+
+  <canvas id="myChart" width="400" height="400"></canvas>
+
+  <a href="safe.html" style="display: inline-block; margin-top: 20px; color: #00ffff; text-decoration: underline;">Go to Safe Browser 🔒</a>
+
+  <button class="reset-btn" onclick="resetData()">Reset All</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let appData = JSON.parse(localStorage.getItem("appData")) || {};
+
+    function saveData() {
+      localStorage.setItem("appData", JSON.stringify(appData));
+      renderChart();
+      renderEntries();
+    }
+
+    function addEntry() {
+      const name = document.getElementById("appName").value.trim();
+      const time = parseInt(document.getElementById("appTime").value.trim());
+
+      if (!name || isNaN(time) || time <= 0) {
+        alert("Please enter valid app name and time.");
+        return;
+      }
+
+      if (appData[name]) {
+        appData[name] += time;
+      } else {
+        appData[name] = time;
+      }
+
+      document.getElementById("appName").value = "";
+      document.getElementById("appTime").value = "";
+
+      saveData();
+    }
+
+    function renderEntries() {
+      const container = document.getElementById("entries");
+      container.innerHTML = "<h3>Today’s Entries:</h3>";
+      for (let app in appData) {
+        container.innerHTML += `<div class="entry">${app}: ${appData[app]} mins</div>`;
+      }
+    }
+
+    function resetData() {
+      if (confirm("Are you sure you want to reset all data?")) {
+        localStorage.removeItem("appData");
+        appData = {};
+        renderChart();
+        renderEntries();
+      }
+    }
+
+    let chart;
+
+    function renderChart() {
+      const ctx = document.getElementById('myChart').getContext('2d');
+      const labels = Object.keys(appData);
+      const data = Object.values(appData);
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Time Spent',
+            data: data,
+            backgroundColor: [
+              '#00ffff',
+              '#ff00cc',
+              '#ff9900',
+              '#66ff66',
+              '#9966ff',
+              '#ff6666'
+            ],
+            borderColor: '#0f0f1a',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: {
+                color: 'white'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    renderChart();
+    renderEntries();
+  </script>
+</body>
+</html>
