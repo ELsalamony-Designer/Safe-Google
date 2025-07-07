@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Safe Browser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #0f0f1a;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    input {
+      width: 200px;
+    }
+    button {
+      background-color: #00ffff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffff;
+    }
+    iframe {
+      margin-top: 20px;
+      width: 90%;
+      height: 500px;
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+    }
+    .blocked {
+      color: red;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Safe Browser 🔒</h1>
+
+  <input type="text" id="urlInput" placeholder="Enter site (e.g. youtube.com)">
+  <button onclick="openSite()">Open Site</button>
+  <br><br>
+
+  <input type="text" id="blockInput" placeholder="Block site (e.g. tiktok.com)">
+  <button onclick="blockSite()">Block</button>
+
+  <input type="text" id="unblockInput" placeholder="Unblock site (password)">
+  <button onclick="unblockSite()">Unblock All</button>
+
+  <div id="blockList"></div>
+  <div id="output"></div>
+
+  <iframe id="browserFrame" style="display:none;"></iframe>
+
+  <script>
+    const PASSWORD = "1234"; // ← غيرها لو حبيت
+
+    let blockedSites = JSON.parse(localStorage.getItem("blockedSites")) || [];
+
+    function saveBlocked() {
+      localStorage.setItem("blockedSites", JSON.stringify(blockedSites));
+      renderBlockList();
+    }
+
+    function renderBlockList() {
+      const blockList = document.getElementById("blockList");
+      blockList.innerHTML = "<h3>Blocked Sites:</h3>";
+      blockedSites.forEach(site => {
+        blockList.innerHTML += `<div>🔒 ${site}</div>`;
+      });
+    }
+
+    function blockSite() {
+      const site = document.getElementById("blockInput").value.trim();
+      if (site && !blockedSites.includes(site)) {
+        blockedSites.push(site);
+        saveBlocked();
+        document.getElementById("blockInput").value = "";
+      }
+    }
+
+    function unblockSite() {
+      const input = document.getElementById("unblockInput").value.trim();
+      if (input === PASSWORD) {
+        blockedSites = [];
+        saveBlocked();
+        alert("All sites unblocked.");
+        document.getElementById("unblockInput").value = "";
+      } else {
+        alert("Wrong password.");
+      }
+    }
+
+    function openSite() {
+      const url = document.getElementById("urlInput").value.trim();
+      const output = document.getElementById("output");
+      const iframe = document.getElementById("browserFrame");
+
+      if (blockedSites.some(site => url.includes(site))) {
+        output.innerHTML = `<div class="blocked">🚫 This site is blocked.</div>`;
+        iframe.style.display = "none";
+      } else {
+        iframe.src = "https://" + url;
+        iframe.style.display = "block";
+        output.innerHTML = "";
+      }
+    }
+
+    renderBlockList();
+  </script>
+</body>
+</html>
