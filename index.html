@@ -59,7 +59,12 @@
 
   <script>
     const blockedWords = [
-      "porn", "xxx", "sex", "nude", "18+", "hentai", "hotgirl", "onlyfans", "nsfw", "camgirl", "naked", "strip"
+      "porn", "xxx", "sex", "nude", "18+", "hentai", "hotgirl",
+      "onlyfans", "nsfw", "camgirl", "naked", "strip", "playboy", "redtube", "xvideos"
+    ];
+
+    const forceNewTabSites = [
+      "youtube.com", "google.com", "facebook.com", "instagram.com", "tiktok.com"
     ];
 
     function openWebsite() {
@@ -67,17 +72,27 @@
       const message = document.getElementById("message");
       const iframe = document.getElementById("browserFrame");
 
-      // check if input includes any blocked words
+      // check if الموقع فيه كلمات محظورة
       const isBlocked = blockedWords.some(word => input.includes(word));
-
       if (isBlocked) {
         message.textContent = "🚫 This website is blocked for your safety.";
         iframe.style.display = "none";
+        return;
+      }
+
+      // جهّز الرابط
+      let formattedURL = input;
+      if (!formattedURL.startsWith("https://") && !formattedURL.startsWith("http://")) {
+        formattedURL = "https://" + formattedURL;
+      }
+
+      // لو الموقع من اللي مش بيسمح iframe → افتحه في تبويب خارجي
+      const forceNewTab = forceNewTabSites.some(site => formattedURL.includes(site));
+      if (forceNewTab) {
+        window.open(formattedURL, "_blank");
+        message.textContent = "Opened in a new tab (site doesn't allow iframe).";
+        iframe.style.display = "none";
       } else {
-        let formattedURL = input;
-        if (!formattedURL.startsWith("https://") && !formattedURL.startsWith("http://")) {
-          formattedURL = "https://" + formattedURL;
-        }
         iframe.src = formattedURL;
         iframe.style.display = "block";
         message.textContent = "";
