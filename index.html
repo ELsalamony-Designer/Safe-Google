@@ -2,101 +2,279 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Safe Browser 🔒</title>
+  <title>Safe Google 🔎🔒</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #0f0f1a;
-      color: #fff;
-      font-family: Arial, sans-serif;
+      background-color: #1e1e1e; /* Darker background */
+      color: #e0e0e0; /* Lighter text for dark theme */
+      font-family: 'Roboto', sans-serif; /* A modern font */
       text-align: center;
       padding: 30px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
     }
     h1 {
-      color: #00ffcc;
-      text-shadow: 0 0 10px #00ffcc;
+      color: #8ab4f8; /* Google-like blue for heading */
+      text-shadow: 0 0 10px rgba(138, 180, 248, 0.5);
+      margin-bottom: 30px;
+      font-size: 2.5em;
     }
-    input, button {
-      padding: 12px;
-      margin: 10px;
+    .search-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 700px;
+    }
+    #searchInput {
+      flex-grow: 1;
+      padding: 12px 20px;
       font-size: 16px;
-      border-radius: 10px;
-      border: none;
+      border-radius: 25px; /* More rounded input */
+      border: 1px solid #5f6368; /* Google-like border color */
+      background-color: #303134; /* Darker input background */
+      color: #e8eaed; /* Input text color */
       outline: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      margin-right: 10px;
     }
-    input {
-      width: 250px;
+    #searchInput:focus {
+      border-color: #8ab4f8; /* Highlight on focus */
+      box-shadow: 0 2px 8px rgba(138, 180, 248, 0.3);
     }
     button {
-      background-color: #00ffcc;
-      color: black;
+      padding: 12px 25px;
+      font-size: 16px;
+      border-radius: 25px;
+      border: none;
+      background-color: #3a3f42; /* Darker button background */
+      color: #e8eaed; /* Button text color */
       font-weight: bold;
-      box-shadow: 0 0 10px #00ffcc;
       cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #5f6368; /* Hover effect */
     }
     iframe {
       width: 90%;
-      height: 500px;
-      border: 2px solid #00ffcc;
+      height: 600px; /* Increased height for better viewing */
+      border: 1px solid #5f6368; /* Consistent border color */
       border-radius: 10px;
       margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: none;
     }
     .blocked {
-      color: red;
-      font-size: 20px;
+      color: #f28b82; /* Reddish color for blocked messages */
+      font-size: 1.2em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    /* Search History Styles */
+    .history-container {
+      background-color: #282828; /* Slightly lighter dark background */
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 30px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      text-align: left;
+    }
+    .history-container h2 {
+      color: #8ab4f8;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.8em;
+    }
+    #searchHistoryList {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    #searchHistoryList li {
+      background-color: #3a3f42; /* Item background */
+      padding: 10px 15px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1em;
+      color: #e0e0e0;
+    }
+    #searchHistoryList li:last-child {
+      margin-bottom: 0;
+    }
+    .history-item-text {
+      cursor: pointer;
+      flex-grow: 1;
+    }
+    .history-item-text:hover {
+      text-decoration: underline;
+    }
+    .delete-history-item {
+      background: none;
+      border: none;
+      color: #f28b82; /* Reddish for delete icon */
+      font-size: 1.2em;
+      cursor: pointer;
+      margin-left: 10px;
+      padding: 5px;
+      border-radius: 50%;
+      transition: background-color 0.3s ease;
+    }
+    .delete-history-item:hover {
+      background-color: rgba(242, 139, 130, 0.2);
+    }
+    .history-buttons {
+      text-align: center;
       margin-top: 20px;
     }
+    .history-buttons button {
+      margin: 0 10px;
+      background-color: #5f6368;
+    }
+    .history-buttons button:hover {
+      background-color: #7a7f83;
+    }
+    #clearHistoryBtn {
+      background-color: #d93025; /* Red for clear all */
+    }
+    #clearHistoryBtn:hover {
+      background-color: #ea4335;
+    }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>🌐 Safe Browser 🔒</h1>
+  <h1>Safe Google 🔎🔒</h1>
 
-  <input type="text" id="urlInput" placeholder="Enter website (e.g. wikipedia.org)" />
-  <button onclick="openWebsite()">Open</button>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="ابحث في Safe Google أو اكتب عنوان URL" />
+    <button onclick="search()">بحث Safe Google</button>
+  </div>
 
   <div id="message" class="blocked"></div>
   <iframe id="browserFrame" style="display:none;"></iframe>
+
+  <div class="history-container">
+    <h2>سجل البحث (Search History)</h2>
+    <ul id="searchHistoryList">
+      </ul>
+    <div class="history-buttons">
+      <button onclick="loadSearchHistory()">عرض كل عمليات البحث</button>
+      <button id="clearHistoryBtn" onclick="clearSearchHistory()">مسح سجل البحث</button>
+    </div>
+  </div>
 
   <script>
     const blockedWords = [
       "porn", "xxx", "sex", "nude", "18+", "hentai", "hotgirl",
       "onlyfans", "nsfw", "camgirl", "naked", "strip", "playboy", "redtube", "xvideos"
     ];
+    const maxHistoryItems = 5; // Maximum items to display initially
 
-    const forceNewTabSites = [
-      "youtube.com", "google.com", "facebook.com", "instagram.com", "tiktok.com"
-    ];
+    // Load search history from local storage
+    let searchHistory = JSON.parse(localStorage.getItem('safeGoogleSearchHistory')) || [];
 
-    function openWebsite() {
-      const input = document.getElementById("urlInput").value.trim().toLowerCase();
+    function saveSearchHistory() {
+      localStorage.setItem('safeGoogleSearchHistory', JSON.stringify(searchHistory));
+    }
+
+    function renderSearchHistory() {
+      const historyList = document.getElementById('searchHistoryList');
+      historyList.innerHTML = ''; // Clear existing list
+
+      const itemsToDisplay = searchHistory.slice(0, maxHistoryItems); // Only show latest few
+
+      if (itemsToDisplay.length === 0) {
+        historyList.innerHTML = '<li style="justify-content: center;">لا توجد عمليات بحث سابقة.</li>';
+        return;
+      }
+
+      itemsToDisplay.forEach((item, index) => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <span class="history-item-text" onclick="resubmitSearch('${item}')">${item}</span>
+          <button class="delete-history-item" onclick="deleteHistoryItem(${index})">X</button>
+        `;
+        historyList.appendChild(listItem);
+      });
+    }
+
+    function addSearchToHistory(query) {
+      // Add only if not already in the last few searches
+      if (!searchHistory.includes(query)) {
+        searchHistory.unshift(query); // Add to the beginning
+        // Keep history size manageable (e.g., last 20 searches)
+        if (searchHistory.length > 20) {
+          searchHistory = searchHistory.slice(0, 20);
+        }
+        saveSearchHistory();
+        renderSearchHistory();
+      }
+    }
+
+    function deleteHistoryItem(index) {
+      searchHistory.splice(index, 1); // Remove item at index
+      saveSearchHistory();
+      renderSearchHistory();
+    }
+
+    function clearSearchHistory() {
+      if (confirm('هل أنت متأكد أنك تريد مسح كل سجل البحث؟')) {
+        searchHistory = [];
+        saveSearchHistory();
+        renderSearchHistory();
+      }
+    }
+
+    function resubmitSearch(query) {
+      document.getElementById("searchInput").value = query;
+      search();
+    }
+
+    function search() {
+      const input = document.getElementById("searchInput").value.trim().toLowerCase();
       const message = document.getElementById("message");
       const iframe = document.getElementById("browserFrame");
 
-      // check if الموقع فيه كلمات محظورة
+      // Check for blocked words
       const isBlocked = blockedWords.some(word => input.includes(word));
       if (isBlocked) {
-        message.textContent = "🚫 This website is blocked for your safety.";
+        message.textContent = "🚫 هذا البحث محظور لسلامتك.";
         iframe.style.display = "none";
         return;
       }
 
-      // جهّز الرابط
-      let formattedURL = input;
-      if (!formattedURL.startsWith("https://") && !formattedURL.startsWith("http://")) {
-        formattedURL = "https://" + formattedURL;
-      }
+      // Add to search history if not a blocked word
+      addSearchToHistory(input);
 
-      // لو الموقع من اللي مش بيسمح iframe → افتحه في تبويب خارجي
-      const forceNewTab = forceNewTabSites.some(site => formattedURL.includes(site));
-      if (forceNewTab) {
-        window.open(formattedURL, "_blank");
-        message.textContent = "Opened in a new tab (site doesn't allow iframe).";
-        iframe.style.display = "none";
-      } else {
-        iframe.src = formattedURL;
-        iframe.style.display = "block";
-        message.textContent = "";
-      }
+      // Search on DuckDuckGo
+      const searchURL = "https://duckduckgo.com/?q=" + encodeURIComponent(input);
+      iframe.src = searchURL;
+      iframe.style.display = "block";
+      message.textContent = "";
+    }
+
+    // Initial rendering of search history when the page loads
+    document.addEventListener('DOMContentLoaded', renderSearchHistory);
+
+    function loadSearchHistory() {
+      // This button can be used to show more history if needed,
+      // but for simplicity, renderSearchHistory already limits what's shown.
+      // If you want a "show all" functionality, you'd need a separate modal or page.
+      // For now, it just re-renders the current limited view.
+      renderSearchHistory();
+      alert('تم عرض أحدث ' + maxHistoryItems + ' عمليات بحث. يمكنك توسيع هذه الوظيفة لعرض المزيد!');
     }
   </script>
 </body>
